@@ -4,7 +4,7 @@ Small utility library for validating and formatting payment card numbers.
 This library supports  
 * Masking PANs
 * Validating PANs
-* Getting Issuer
+* Getting Schemes from Bin Range
 * Generating Random PANs
 
 ## Usage
@@ -24,7 +24,7 @@ Validating pans
     // useful if you just want a Luhn Check
     fmt.Println(CardUtils.LuhnCheck(pan)) // true
     // this also verifies card length
-    fmt.Println(CardUtils.VerifyPan(pan)) // true
+    fmt.Println(CardUtils.ValidityCheck(pan)) // true
 
 Getting Scheme
 
