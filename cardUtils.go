@@ -107,6 +107,82 @@ func GenerateRandomPan() string {
 	return GenerateRandomPanOfLength(16)
 }
 
+func fillPanWithRandomUntilValid(pan string, length int) string {
+	for len(pan) < (length - 1) {
+		pan += strconv.Itoa(rand.Intn(10))
+	}
+
+	for i := 0; i < 10; i++ {
+		if LuhnCheck(pan + strconv.Itoa(i)) {
+			return pan + strconv.Itoa(i)
+		}
+	}
+	// should never happen.
+	panic("Could not generate a valid PAN from base " + pan)
+}
+
+func GenerateRandomPanOfScheme(scheme Scheme.Scheme) string {
+	switch scheme {
+	case Scheme.Visa:
+		return fillPanWithRandomUntilValid("4", 16)
+	case Scheme.AmericanExpress:
+		// 34 or 37
+		sPan := "3"
+		if rand.Intn(2) == 0 {
+			sPan += "4"
+		} else {
+			sPan += "7"
+		}
+		return fillPanWithRandomUntilValid(sPan, 15)
+	case Scheme.MasterCard:
+		// 51 - 55
+		sPan := "5"
+		sPan += strconv.Itoa(rand.Intn(5) + 1)
+		return fillPanWithRandomUntilValid(sPan, 16)
+	case Scheme.DinersClub:
+		sPan := "3"
+		if rand.Intn(2) == 0 {
+			sPan += "6"
+		} else {
+			sPan += "8"
+		}
+		return fillPanWithRandomUntilValid(sPan, 14)
+	case Scheme.JCB:
+		return fillPanWithRandomUntilValid("35", 16)
+	case Scheme.Discover:
+		// 6011 or 65
+		return fillPanWithRandomUntilValid("6011", 16)
+	case Scheme.BPCard:
+		return generateRandomBPCardPan()
+	case Scheme.UnionPay:
+		return generateRandomUnionPayPan()
+	default:
+		return GenerateRandomPan()
+	}
+}
+
+func generateRandomBPCardPan() string {
+	// 7052 or 7050
+	sPan := "705"
+	if rand.Intn(2) == 0 {
+		sPan += "2"
+	} else {
+		sPan += "0"
+	}
+	return fillPanWithRandomUntilValid(sPan, 19)
+}
+
+func generateRandomUnionPayPan() string {
+	// 6200**-6250**
+	sPan := "62"
+	next := rand.Intn(6) // number between 0 and 5
+	sPan += strconv.Itoa(next)
+	if next == 5 || next == 0 {
+		sPan += "0"
+	}
+	return fillPanWithRandomUntilValid(sPan, 16)
+}
+
 // LuhnCheck performs a Luhn check on the card number
 func LuhnCheck(pan string) bool {
 	// check every digit is int

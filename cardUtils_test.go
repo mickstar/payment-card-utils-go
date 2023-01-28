@@ -320,3 +320,95 @@ func TestGetCardIssuer(t *testing.T) {
 		})
 	}
 }
+
+func Test_generateRandomBPCardPan(t *testing.T) {
+	s := generateRandomBPCardPan()
+	if !LuhnCheck(s) {
+		t.Errorf("generateRandomBPCardPan() = %v, want a valid pan", s)
+	}
+	if !ValidityCheck(s) {
+		t.Errorf("generateRandomBPCardPan() = %v, want a valid pan", s)
+	}
+
+	if GetCardScheme(s) != Scheme.BPCard {
+		t.Errorf("generateRandomBPCardPan() = %v, want a valid pan", s)
+	}
+}
+
+func Test_generateRandomUnionPayPan(t *testing.T) {
+	s := generateRandomUnionPayPan()
+	if !LuhnCheck(s) {
+		t.Errorf("generateRandomUnionPayPan() = %v, want a valid pan", s)
+	}
+	if !ValidityCheck(s) {
+		t.Errorf("generateRandomUnionPayPan() = %v, want a valid pan", s)
+	}
+
+	if GetCardScheme(s) != Scheme.UnionPay {
+		t.Errorf("generateRandomUnionPayPan() = %v, want a valid pan", s)
+	}
+}
+
+func TestGenerateRandomPanOfScheme(t *testing.T) {
+	for i := 0; i < 1_000; i++ {
+		var schemes []Scheme.Scheme = []Scheme.Scheme{Scheme.MasterCard,
+			Scheme.Visa,
+			Scheme.AmericanExpress,
+			Scheme.JCB,
+			Scheme.DinersClub,
+			Scheme.BPCard,
+			Scheme.UnionPay,
+			Scheme.Discover,
+		}
+		for _, s := range schemes {
+			pan := GenerateRandomPanOfScheme(s)
+			if !LuhnCheck(pan) {
+				t.Errorf("GenerateRandomPanOfScheme() = %v, want a valid pan", pan)
+			}
+			if !ValidityCheck(pan) {
+				t.Errorf("GenerateRandomPanOfScheme() = %v, want a valid pan", pan)
+			}
+			if GetCardScheme(pan) != s {
+				t.Errorf("GenerateRandomPanOfScheme() = %v, want a valid pan", pan)
+			}
+		}
+
+		s := GenerateRandomPanOfScheme(Scheme.Unknown)
+		if !LuhnCheck(s) {
+			t.Errorf("GenerateRandomPanOfScheme() = %v, want a valid pan", s)
+		}
+	}
+}
+
+func TestValidityCheck1(t *testing.T) {
+	type args struct {
+		pan string
+	}
+	tests := []struct {
+		name string
+		args args
+		want bool
+	}{
+		{
+			name: "invalid visa",
+			args: args{
+				pan: "4111111111111112",
+			},
+			want: false,
+		},
+		{
+			name: "invalid visa 2",
+			args: args{
+				pan: "41111111111111",
+			},
+			want: false,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := ValidityCheck(tt.args.pan); got != tt.want {
+				t.Errorf("ValidityCheck() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}

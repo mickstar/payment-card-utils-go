@@ -9,7 +9,7 @@ This library supports
 
 ## Usage
 
-    go get github.com/mickstar/payment-card-utils-go v0.1.0
+    go get github.com/mickstar/payment-card-utils-go v0.2.0
 
 Masking pans
 
@@ -44,7 +44,9 @@ Getting Scheme
 Generating Random PANs
     
         fmt.Println(CardUtils.GenerateRandomPan() // 1274574654654654
-
+        fmt.Println(CardUtils.GenerateRandomPanWithScheme(Scheme.MasterCard)) // 5123456789012345
+        fmt.Println(CardUtils.GenerateRandomPanWithScheme(Scheme.Visa)) // 4123456789012345
+These Pans are guarenteed to match the bin range and pass the Luhn Check.
 
 ## Author
 Michael Johnston <michael.johnston29@gmail.com>
